@@ -4,31 +4,26 @@ import { MenuServiceClient, ServiceError } from '../../_proto/mookies_pb_service
 import { grpc } from '@improbable-eng/grpc-web';
 
 const host = 'http://localhost:9090';
-
 @Injectable({
   providedIn: 'root'
 })
 export class MenuService {
   menu: Category[];
-  constructor(public menuService: MenuServiceClient) { }
+  client: MenuServiceClient;
 
-  getMenu(): Menu | null {
-    this.menuService.getMenu(new Empty(),
-      (err: ServiceError | null, res: Menu | null) => {
+  constructor() {
+    this.client = new MenuServiceClient(host);
+  }
+
+  get(): Promise <object> {
+    return new Promise((resolve, reject) => {
+      const req = new Empty();
+      this.client.getMenu(req, null, (err, response: Menu) => {
         if (err) {
-          if (err.code === grpc.Code.OK) {
-            return res;
-          } else {
-            console.log("failed to get menu:" + err);
-            return null;
-          }
-        } else {
-          if (res) {
-            return res;
-          }
-          return null;
+          return reject(err);;
         }
-      })
-    return null;
+        resolve(response.toObject());
+      });
+    });
   }
 }

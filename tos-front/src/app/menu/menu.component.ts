@@ -8,14 +8,14 @@ import { Category, Menu } from '_proto/mookies_pb';
   styleUrls: ['./menu.component.scss']
 })
 export class MenuComponent implements OnInit {
-  menu: Menu;
+  menu: Menu.AsObject;
+  public collapsed: boolean[]
   constructor(private menuService: MenuService) { }
 
   ngOnInit() {
-    this.getMenu();
-  }
-
-  getMenu(): void {
-    this.menu = this.menuService.getMenu();
+    this.menuService.get().then((data: Menu.AsObject) => {
+      this.menu = data;
+      this.collapsed = new Array<boolean>(this.menu.categoriesList.length).fill(false);
+    })
   }
 }

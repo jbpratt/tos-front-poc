@@ -6,6 +6,8 @@ import { AppComponent } from './app.component';
 import { CreateItemComponent } from './create-item/create-item.component';
 import { MenuComponent } from './menu/menu.component';
 import { MenuService } from './menu.service';
+import { MenuServiceClient } from '_proto/mookies_pb_service';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -15,7 +17,8 @@ import { MenuService } from './menu.service';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    NgbModule
   ],
   providers: [MenuService],
   bootstrap: [AppComponent]

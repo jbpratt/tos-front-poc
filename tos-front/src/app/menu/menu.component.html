@@ -1,1 +1,25 @@
-<p>menu works!</p>
+<div class="accordion" id="REE">
+    <div *ngFor="let category of menu?.categoriesList; let i = index">
+        <div class="card">
+            <div class="card-header" id="h{{i}}">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{{i}}"
+                    aria-expanded="true" aria-controls="{{i}}">
+                    {{category.name}}
+                </button>
+            </div>
+            <div id="{{i}}" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+
+            </div>
+            <div class="row d-flex">
+                <div *ngFor="let item of category.itemsList">
+                    <div class="card-inner card p-2 m-2">
+                        <div class="card-body">
+                            <div class="card-title crop-text-1"><strong>{{item.name}}</strong></div>
+                            <div class="description">{{ item.price/100 }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
