@@ -1,56 +1,63 @@
-import { Empty, Menu, Category } from '../../tos-front/_proto/mookies_pb';
-import { MenuServiceClient, ServiceError } from '../../tos-front/_proto/mookies_pb_service';
+import { Empty, Menu, Category, Item } from '../../_proto/mookies_pb';
+import { MenuServiceClient, ServiceError } from '../../_proto/mookies_pb_service';
 import * as $ from 'jquery';
-import { grpc } from '@improbable-eng/grpc-web';
 
 const host = 'http://localhost:9090';
 
 class MenuApp {
   menu: Category[];
-  constructor(public menuService: MenuServiceClient) { }
+  client: MenuServiceClient;
+  constructor() {
+    this.client = new MenuServiceClient(host);
+  }
 
-  requestMenu() {
-    this.menuService.getMenu(new Empty(),
-      (err: ServiceError | null, res: Menu | null) => {
+  getMenuAsync(): Promise<Menu> {
+    return new Promise((resolve, reject) => {
+      const req = new Empty();
+      this.client.getMenu(req, (err: ServiceError, response: Menu) => {
         if (err) {
-          if (err.code === grpc.Code.OK) {
-            console.log(res)
-          }
-        } else {
-          if (res) {
-            this.setMenu(res);
-          }
-        }
-      })
+          return reject(err);;
+        };
+        resolve(response);
+      });
+    });
   }
 
   setMenu(_menu: Menu) {
     this.menu = _menu.getCategoriesList();
-    console.log(this.menu);
-    this.build();
   }
 
   load() {
-    this.requestMenu();
+    this.getMenuAsync().then((val) => 
+      this.setMenu(val)).then(() => this.build());
   }
 
   build() {
-    $(document).ready(function () {
-      var elem = document.createElement('div');
-      var list = document.createElement('li');
+    $(document).ready(() => {
+      var menu: HTMLDivElement = document.createElement('div');
+      var ulist: HTMLUListElement = document.createElement('ul');
 
-      this.menu.map(function(i: Category) {
-        var p = document.createElement('p');
-        p.innerText = i.getName();
-        list.appendChild(p);
+      this.menu.map(function (cat: Category) {
+        var li: HTMLLIElement = document.createElement('li');
+        var div: HTMLDivElement = document.createElement('div');
+        var h4: HTMLHeadingElement = document.createElement('h4');
+        h4.innerText = cat.getName();
+        div.appendChild(h4);
+        var itemList: HTMLUListElement = document.createElement('ul');
+        cat.getItemsList().map((i: Item) => {
+          var p: HTMLParagraphElement = document.createElement('p');
+          p.innerText = i.getName();
+          itemList.appendChild(p);
+        });
+        div.appendChild(itemList);
+        li.appendChild(div);
+        ulist.appendChild(li);
       });
-
-      elem.appendChild(list);
-      document.appendChild(elem);
-    });
+      menu.appendChild(ulist);
+      $('#menu').append(menu);
+    })
   }
 }
 
-const menuService = new MenuServiceClient(host);
-const menuApp = new MenuApp(menuService);
+const menuApp = new MenuApp();
 menuApp.load();
