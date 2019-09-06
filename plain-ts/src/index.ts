@@ -28,33 +28,44 @@ class MenuApp {
   }
 
   load() {
-    this.getMenuAsync().then((val) => 
+    this.getMenuAsync().then((val) =>
       this.setMenu(val)).then(() => this.build());
   }
 
-  build() {
-    $(document).ready(() => {
-      var menu: HTMLDivElement = document.createElement('div');
-      var ulist: HTMLUListElement = document.createElement('ul');
+  whatTimeIsIt() {
+    var d = new Date();
+    var t = d.toLocaleTimeString();
+    $(".time").html(t);
+  }
 
-      this.menu.map(function (cat: Category) {
-        var li: HTMLLIElement = document.createElement('li');
-        var div: HTMLDivElement = document.createElement('div');
-        var h4: HTMLHeadingElement = document.createElement('h4');
-        h4.innerText = cat.getName();
-        div.appendChild(h4);
-        var itemList: HTMLUListElement = document.createElement('ul');
-        cat.getItemsList().map((i: Item) => {
-          var p: HTMLParagraphElement = document.createElement('p');
-          p.innerText = i.getName();
-          itemList.appendChild(p);
-        });
-        div.appendChild(itemList);
-        li.appendChild(div);
-        ulist.appendChild(li);
+  buildMenu() {
+    this.menu.map(function (cat: Category) {
+      var catDiv: HTMLDivElement = document.createElement('div');
+      catDiv.className = "grid-item";
+      var catH4: HTMLHeadingElement = document.createElement('h4');
+      catH4.innerText = cat.getName();
+      catDiv.appendChild(catH4);
+      var itemList: HTMLUListElement = document.createElement('ul');
+      cat.getItemsList().map((i: Item) => {
+        var ili: HTMLLIElement = document.createElement('li');
+        var btn: HTMLButtonElement = document.createElement('button');
+        btn.className = "menuItemBtn";
+        btn.textContent = i.getName();
+        ili.appendChild(btn);
+        itemList.appendChild(ili);
       });
-      menu.appendChild(ulist);
-      $('#menu').append(menu);
+      catDiv.appendChild(itemList);
+      $('#menu').append(catDiv);
+    });
+
+  }
+
+  build() {
+    $(() => {
+      setInterval(this.whatTimeIsIt, 1000);
+      // this should be called based on the current 
+      // setting (which side of the meun)
+      this.buildMenu();
     })
   }
 }
