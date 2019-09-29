@@ -1,4 +1,4 @@
-import { Empty, Menu, Category, Item } from '../../_proto/mookies_pb';
+import { Empty, Menu, Category, Item, Order } from '../../_proto/mookies_pb';
 import { MenuServiceClient, ServiceError } from '../../_proto/mookies_pb_service';
 import * as $ from 'jquery';
 
@@ -6,6 +6,7 @@ const host = 'http://localhost:9090';
 
 class MenuApp {
   menu: Category[];
+  currOrder: Order
   client: MenuServiceClient;
   constructor() {
     this.client = new MenuServiceClient(host);
@@ -36,6 +37,11 @@ class MenuApp {
     var d = new Date();
     var t = d.toLocaleTimeString();
     $(".time").html(t);
+  }
+
+  addItemToOrder(item: Item) {
+    this.currOrder.addItems(item);
+    console.log(this.currOrder);
   }
 
   buildMenu() {
